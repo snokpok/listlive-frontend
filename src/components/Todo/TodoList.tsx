@@ -68,9 +68,6 @@ export default function TodoList() {
         });
     };
 
-    if (!userContext.user.token) {
-        return null;
-    }
     if (queryTodoList.isError) {
         toast.error('Oops, something went wrong');
     }
