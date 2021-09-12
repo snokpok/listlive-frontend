@@ -57,3 +57,26 @@ export const axiosReqEditTodo = (
     });
     return axiosReq;
 };
+
+interface EditTodoOrder {
+    itemId: string;
+    newOrder: number;
+}
+
+export const axiosReqEditTodoOrder = (
+    token: string | null,
+    body: EditTodoOrder,
+) => {
+    const axiosReq = axios({
+        method: 'put',
+        url: `${serverConfigs.backend_dev}/todo/change-order`,
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        data: {
+            item_id: body.itemId,
+            new_order: body.newOrder,
+        },
+    });
+    return axiosReq;
+};

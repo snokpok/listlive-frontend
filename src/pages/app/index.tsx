@@ -1,35 +1,31 @@
 import TodoList from '@/components/Todo/TodoList';
 import React from 'react';
-import { GetServerSideProps } from 'next';
-import cookies from 'next-cookies';
 import { UserContext } from '@/common/contexts/user.context';
 import ProfileWidget from '@/components/User/ProfileWidget';
+import Head from 'next/head';
+import { useRouter } from 'next/router';
 
-interface Props {
-    token: string;
-}
-
-export default function AppHome({ token }: Props) {
+export default function AppHome() {
     const userContext = React.useContext(UserContext);
+    const router = useRouter();
+
     React.useEffect(() => {
-        userContext.setUser({ token: token, id: userContext.user.id });
-    }, [userContext.user.token, token]);
+        if (!userContext.user.token) {
+            router.replace('/login');
+        }
+    }, [userContext.user.token]);
 
     return (
-        <div className="flex flex-col justify-center items-center min-h-screen bg-black overflow-y-auto">
-            {userContext.user.token && <ProfileWidget />}
-            <div className="flex flex-col rounded-lg bg-white p-5 overflow-y-auto my-10">
-                {userContext.user.token && <TodoList />}
+        <>
+            <Head>
+                <title>Home | Listlive</title>
+            </Head>
+            <div className="flex flex-col justify-center items-center min-h-screen bg-black overflow-y-auto">
+                {userContext.user.token && <ProfileWidget />}
+                <div className="flex flex-col rounded-lg bg-white p-5 pt-0 overflow-y-auto my-10">
+                    {userContext.user.token && <TodoList />}
+                </div>
             </div>
-        </div>
+        </>
     );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-    const c = cookies(context);
-    return {
-        props: {
-            token: c.t,
-        },
-    };
-};

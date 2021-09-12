@@ -5,6 +5,8 @@ import React from 'react';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
+import AppLogo from '@/public/listlive-icon.png';
 
 export const registerSchema = Yup.object().shape({
     email: Yup.string()
@@ -38,7 +40,7 @@ export default function RegisterForm() {
                 {
                     loading: 'Creating your account...',
                     success: 'Successfully created account',
-                    error: 'Oops something went wrong',
+                    error: 'Account associated with email already exists; please register with a unique email',
                 },
                 {
                     position: 'bottom-left',
@@ -53,42 +55,61 @@ export default function RegisterForm() {
     });
 
     return (
-        <form
-            onSubmit={formik.handleSubmit}
-            className="flex flex-col space-y-2 items-center shadow-2xl w-96 p-8 rounded-lg"
-        >
-            <input
-                type="email"
-                placeholder="Email"
-                name="email"
-                onChange={formik.handleChange}
-                className={`w-10/12`}
-            />
-            <input
-                placeholder="First name"
-                name="firstName"
-                onChange={formik.handleChange}
-                className={`w-10/12`}
-            />
-            <input
-                placeholder="Last name"
-                name="lastName"
-                onChange={formik.handleChange}
-                className="w-10/12"
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                name="password"
-                onChange={formik.handleChange}
-                className="w-10/12"
-            />
-            <button
-                type="submit"
-                className="bg-black text-white w-16 p-3 rounded-lg hover:opacity-80 transition"
+        <div className="bg-white flex flex-col space-y-2 shadow-2xl w-96 p-8 rounded-lg">
+            <div className="flex flex-col items-center text-2xl font-bold">
+                <div>
+                    <Image src={AppLogo} width={40} height={40} />
+                </div>
+                Create an account
+            </div>
+            <form
+                onSubmit={formik.handleSubmit}
+                className="flex flex-col space-y-2 items-center"
             >
-                Register
-            </button>
-        </form>
+                <input
+                    type="email"
+                    placeholder="Email"
+                    name="email"
+                    onChange={formik.handleChange}
+                    className={`w-10/12 rounded-lg border-gray-300 focus:border-black focus:ring-1 focus:outline-none`}
+                />
+                <input
+                    type="text"
+                    placeholder="First name"
+                    name="firstName"
+                    onChange={formik.handleChange}
+                    className={`w-10/12 rounded-lg border-gray-300 focus:border-black focus:ring-1 focus:outline-none`}
+                />
+                <input
+                    type="text"
+                    placeholder="Last name"
+                    name="lastName"
+                    onChange={formik.handleChange}
+                    className={`w-10/12 rounded-lg border-gray-300 focus:border-black focus:ring-1 focus:outline-none`}
+                />
+                <input
+                    type="password"
+                    placeholder="Password"
+                    name="password"
+                    onChange={formik.handleChange}
+                    className={`w-10/12 rounded-lg border-gray-300 focus:border-black focus:ring-1 focus:outline-none`}
+                />
+                <button
+                    type="submit"
+                    className="bg-black text-white p-3 rounded-lg hover:opacity-80 transition"
+                >
+                    Register
+                </button>
+                <a
+                    onClick={(e) => {
+                        e.preventDefault();
+                        router.push('/login');
+                    }}
+                    className="underline text-blue-500 cursor-pointer"
+                >
+                    Login instead
+                </a>
+            </form>
+        </div>
     );
 }

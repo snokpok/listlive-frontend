@@ -4,6 +4,7 @@ import axios from 'axios';
 import React from 'react';
 import { useQuery } from 'react-query';
 import BarLoader from 'react-spinners/BarLoader';
+import LogoutWidget from '../Auth/LogoutWidget';
 
 interface PropsUserWidget {
     token: string | null;
@@ -36,6 +37,7 @@ export default function ProfileWidget() {
                     {queryProfile.data?.data.email}
                 </div>
             </div>
+            <LogoutWidget />
         </div>
     );
 }
