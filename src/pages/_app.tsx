@@ -1,18 +1,24 @@
 import React from 'react';
 import App, { AppContext, AppProps } from 'next/app';
 import '@/styles/global.css';
-import { QueryClient, QueryClientProvider } from 'react-query';
+import { QueryClient, QueryClientProvider, useQuery } from 'react-query';
 import { Toaster } from 'react-hot-toast';
 import { UserContext, UserInterface } from '@/common/contexts/user.context';
 import LoadingScreen from '@/components/Misc/LoadingScreen';
 import cookies from 'next-cookies';
 import { useRouter } from 'next/router';
+import { axiosReqDecodeToken } from '@/common/web/queries';
+import { AxiosResponse } from 'axios';
 
 export default function MyApp({
     Component,
     pageProps,
     c,
-}: AppProps & { c: Record<string, string> }) {
+}: // decodeTokenRes,
+AppProps & {
+    c: Record<string, string>;
+    // decodeTokenRes: AxiosResponse<any>;
+}) {
     const queryClient = new QueryClient();
     const [user, setUser] = React.useState<UserInterface>({
         token: '',

@@ -80,3 +80,10 @@ export const axiosReqEditTodoOrder = (
     });
     return axiosReq;
 };
+
+export const axiosReqDecodeToken = (token: string | null) => {
+    return axios({
+        method: 'get',
+        url: `${serverConfigs.backend_dev}/decode-token?token=${token}`,
+    });
+};
