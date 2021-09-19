@@ -1,10 +1,11 @@
-import TodoEditorContext from '@/common/contexts/todo-editor.context';
 import { InputFormRaw } from '@/common/interfaces/form-interfaces';
 import React from 'react';
 
-function TodoInputFormRaw({ formik, submitButtonValue }: InputFormRaw) {
-    const todoEditorContext = React.useContext(TodoEditorContext);
-
+function ListInputFormRaw({
+    formik,
+    submitButtonValue,
+    onCancel,
+}: InputFormRaw & { onCancel?: Function }) {
     return (
         <form
             onSubmit={formik.handleSubmit}
@@ -15,7 +16,7 @@ function TodoInputFormRaw({ formik, submitButtonValue }: InputFormRaw) {
                 name="title"
                 value={formik.values.title}
                 onChange={formik.handleChange}
-                placeholder="Clean your dishes"
+                placeholder="Reading list!"
                 autoComplete="off"
                 className="border-transparent font-bold w-full p-2 focus:outline-none placeholder-gray-400"
             />
@@ -24,9 +25,8 @@ function TodoInputFormRaw({ formik, submitButtonValue }: InputFormRaw) {
                 name="description"
                 value={formik.values.description}
                 onChange={formik.handleChange}
-                placeholder="Do after homework"
+                placeholder="An absolute necessity to your daily life"
                 className="resize-none border-transparent focus:border-transparent focus:ring-transparent text-xs placeholder-gray-300"
-                rows={5}
             />
             <div className="flex space-x-1">
                 <input
@@ -41,14 +41,10 @@ function TodoInputFormRaw({ formik, submitButtonValue }: InputFormRaw) {
                 />
                 <input
                     type="button"
-                    className={`bg-gray-400 border-2 border-gray-500 text-white w-1/4 rounded-lg h-7 self-center shadow cursor-pointer hover:bg-white hover:text-gray-600 transition`}
+                    className={`bg-gray-400 border-2 border-gray-500 text-white w-2/4 rounded-lg h-7 self-center shadow cursor-pointer hover:bg-white hover:text-gray-600 transition`}
                     value="Cancel"
                     onClick={() => {
-                        todoEditorContext.setEditor({
-                            editingItemId: null,
-                            openCreate: false,
-                        });
-                        formik.setValues({ title: '', description: '' });
+                        if (onCancel) onCancel();
                     }}
                 />
             </div>
@@ -56,4 +52,4 @@ function TodoInputFormRaw({ formik, submitButtonValue }: InputFormRaw) {
     );
 }
 
-export default TodoInputFormRaw;
+export default ListInputFormRaw;

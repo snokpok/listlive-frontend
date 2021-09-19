@@ -7,8 +7,6 @@ import { UserContext, UserInterface } from '@/common/contexts/user.context';
 import LoadingScreen from '@/components/Misc/LoadingScreen';
 import cookies from 'next-cookies';
 import { useRouter } from 'next/router';
-import { axiosReqDecodeToken } from '@/common/web/queries';
-import { AxiosResponse } from 'axios';
 
 export default function MyApp({
     Component,
@@ -23,13 +21,14 @@ AppProps & {
     const [user, setUser] = React.useState<UserInterface>({
         token: '',
         id: '',
+        emoji: '',
     });
     const [appReady, setAppReady] = React.useState(false);
     const router = useRouter();
 
     React.useEffect(() => {
         if (c.t) {
-            setUser({ token: c.t, id: '' });
+            setUser({ token: c.t, id: '', emoji: '' });
             router.replace('/app');
         }
         setTimeout(() => {

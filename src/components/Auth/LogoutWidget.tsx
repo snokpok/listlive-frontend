@@ -10,12 +10,14 @@ function LogoutWidget() {
     return (
         <button
             onClick={() => {
+                router.replace('/');
+                logOutHandler();
                 userContext.setUser({
                     token: '',
                     id: '',
+                    emoji: '',
                 });
-                logOutHandler();
-                router.replace('/');
+                router.reload();
             }}
             className="hover:bg-red-400 text-white bg-red-500 rounded-lg p-3 transition"
         >

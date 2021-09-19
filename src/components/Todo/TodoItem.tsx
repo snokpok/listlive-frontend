@@ -1,6 +1,8 @@
 import TodoEditorContext from '@/common/contexts/todo-editor.context';
 import { UserContext } from '@/common/contexts/user.context';
-import { axiosReqDeleteTodo } from '@/common/web/queries';
+import { useMyLists } from '@/common/stores/useMyLists';
+import { useViewingUser } from '@/common/stores/useViewingUser';
+import { axiosReqDeleteItem } from '@/common/web/queries';
 import axios from 'axios';
 import React from 'react';
 import { ReactElement } from 'react';
@@ -11,25 +13,34 @@ import { useMutation } from 'react-query';
 import EditTodoWidget from './EditTodoWidget';
 import TodoEditFields, { TodoItemProps } from './TodoEditFields';
 
-export const CheckOffItem = ({
-    id,
-    handleDeleteItem,
-}: Pick<TodoItemProps, 'handleDeleteItem' | 'id'>) => {
-    const userContext = React.useContext(UserContext);
+interface DeleteTodoItemInterface {
+    listId: string;
+    itemId: string;
+}
 
-    const mutationCheckOffItem = useMutation(async (id: string) => {
-        const axiosCheckOff = axiosReqDeleteTodo(userContext.user.token, id);
-        const { data } = await toast.promise(
-            axiosCheckOff,
-            {
-                loading: 'Checking off...',
-                success: 'Hurray!!!! Nice job',
-                error: 'Oops something went wrong',
-            },
-            { icon: '🎊', position: 'bottom-right' },
-        );
-        handleDeleteItem(id);
-    });
+export const CheckOffItem = ({ listId, itemId }: DeleteTodoItemInterface) => {
+    const { user } = React.useContext(UserContext);
+    const deleteItemFromList = useMyLists((state) => state.deleteItemFromList);
+
+    const mutationCheckOffItem = useMutation(
+        async ({ listId, itemId }: DeleteTodoItemInterface) => {
+            const axiosCheckOff = axiosReqDeleteItem(
+                user.token,
+                listId,
+                itemId,
+            );
+            const { data } = await toast.promise(
+                axiosCheckOff,
+                {
+                    loading: 'Checking off...',
+                    success: 'Hurray!!!! Nice job',
+                    error: 'Oops something went wrong',
+                },
+                { icon: '🎊', position: 'bottom-right' },
+            );
+            deleteItemFromList(listId, itemId);
+        },
+    );
 
     return (
         <div className="p-1 mr-2">
@@ -37,7 +48,7 @@ export const CheckOffItem = ({
                 <BsCheck
                     className="text-lg hover:opacity-100 opacity-0 font-bold transition m-1 cursor-pointer"
                     onClick={() => {
-                        mutationCheckOffItem.mutate(id);
+                        mutationCheckOffItem.mutate({ listId, itemId });
                     }}
                 />
             </div>
@@ -46,22 +57,23 @@ export const CheckOffItem = ({
 };
 
 export default function TodoItem({
+    listId,
     id,
     title,
     description,
-    handleDeleteItem,
-    handleUpdateItem,
 }: TodoItemProps): ReactElement | null {
     const todoEditorContext = React.useContext(TodoEditorContext);
-    const userContext = React.useContext(UserContext);
+    const { user } = React.useContext(UserContext);
+    const viewingUser = useViewingUser((state) => state.viewingUser);
+    const deleteItemFromList = useMyLists((state) => state.deleteItemFromList);
 
     if (todoEditorContext.editor.editingItemId === id)
         return (
             <TodoEditFields
+                listId={listId}
                 id={id}
                 title={title}
                 description={description}
-                handleUpdateItem={handleUpdateItem}
             />
         );
 
@@ -71,22 +83,24 @@ export default function TodoItem({
             key={id}
         >
             <div className="flex">
-                <CheckOffItem id={id} handleDeleteItem={handleDeleteItem} />
+                {!viewingUser && <CheckOffItem listId={listId} itemId={id} />}
                 <div className="flex flex-col">
                     <div className="font-semibold">{title}</div>
                     <div className="text-sm text-gray-500">{description}</div>
                 </div>
             </div>
-            <div className="flex flex-col justify-self-end space-y-1">
-                <AiFillCloseCircle
-                    className="hover:text-red-500 transition-colors text-lg cursor-pointer"
-                    onClick={async () => {
-                        await axiosReqDeleteTodo(userContext.user.token, id);
-                        handleDeleteItem(id);
-                    }}
-                />
-                <EditTodoWidget id={id} />
-            </div>
+            {!viewingUser ? (
+                <div className="flex flex-col justify-self-end space-y-1">
+                    <AiFillCloseCircle
+                        className="hover:text-red-500 transition-colors text-lg cursor-pointer"
+                        onClick={async () => {
+                            await axiosReqDeleteItem(user.token, listId, id);
+                            deleteItemFromList(listId, id);
+                        }}
+                    />
+                    <EditTodoWidget id={id} />
+                </div>
+            ) : null}
         </div>
     );
 }

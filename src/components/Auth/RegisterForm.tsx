@@ -28,7 +28,7 @@ export default function RegisterForm() {
         onSubmit: async (values, actions) => {
             const response = await toast.promise(
                 axios({
-                    url: `${serverConfigs.backend_dev}/user`,
+                    url: `${serverConfigs.backend_dev}/auth/register`,
                     method: 'post',
                     data: {
                         email: values.email,
@@ -58,7 +58,15 @@ export default function RegisterForm() {
         <div className="bg-white flex flex-col space-y-2 shadow-2xl w-96 p-8 rounded-lg">
             <div className="flex flex-col items-center text-2xl font-bold">
                 <div>
-                    <Image src={AppLogo} width={40} height={40} />
+                    <Image
+                        src={AppLogo}
+                        width={40}
+                        height={40}
+                        onClick={() => {
+                            router.replace('/');
+                        }}
+                        className="cursor-pointer"
+                    />
                 </div>
                 Create an account
             </div>

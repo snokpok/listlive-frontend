@@ -1,6 +1,6 @@
 import { UserContext } from '@/common/contexts/user.context';
 import { ITodoItem } from '@/common/interfaces/todo-interfaces';
-import { axiosReqCreateTodo } from '@/common/web/queries';
+import { axiosReqCreateItemAtList } from '@/common/web/queries';
 import { useFormik } from 'formik';
 import React from 'react';
 import toast from 'react-hot-toast';
@@ -9,18 +9,25 @@ import * as Yup from 'yup';
 import TodoEditorContext from '@/common/contexts/todo-editor.context';
 import TodoInputFormRaw from './TodoInputFormRaw';
 import AddTodoWidget from './AddTodoWidget';
+import { useMyLists } from '@/common/stores/useMyLists';
+import shallow from 'zustand/shallow';
 
 interface ITodoCreatorField {
-    setTodoList: React.Dispatch<React.SetStateAction<ITodoItem[]>>;
+    listId: string;
 }
 
-export default function TodoCreatorFields(props: ITodoCreatorField) {
+export default function TodoCreatorFields({ listId }: ITodoCreatorField) {
     const todoEditorContext = React.useContext(TodoEditorContext);
     const userContext = React.useContext(UserContext);
+    const { addItemsToList } = useMyLists((state) => state, shallow);
 
     const createTodoItemMutation = useMutation(
         async (item: Omit<ITodoItem, 'id'>) => {
-            const axiosReq = axiosReqCreateTodo(userContext.user.token, item);
+            const axiosReq = axiosReqCreateItemAtList(
+                userContext.user.token,
+                item,
+                listId,
+            );
             const { data } = await toast.promise(
                 axiosReq,
                 {
@@ -30,14 +37,12 @@ export default function TodoCreatorFields(props: ITodoCreatorField) {
                 },
                 { position: 'bottom-left' },
             );
-            props.setTodoList((prevList) => [
-                ...prevList,
-                {
-                    id: data.id,
-                    title: item.title,
-                    description: item.description,
-                },
-            ]);
+            const newItem = {
+                id: data.id,
+                title: item.title,
+                description: item.description,
+            };
+            addItemsToList(listId, [newItem]);
             return data;
         },
     );

@@ -1,4 +1,3 @@
-import { UserContext } from '@/common/contexts/user.context';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import React from 'react';
@@ -7,12 +6,6 @@ import Image from 'next/image';
 
 export default function Home() {
     const router = useRouter();
-    const userContext = React.useContext(UserContext);
-
-    if (userContext.user.token) {
-        router.replace('/app');
-        return null;
-    }
 
     return (
         <>
@@ -25,12 +18,11 @@ export default function Home() {
                     <div>Listlive</div>
                 </div>
                 <div className="flex flex-col p-2 text-lg font-semibold">
-                    We're making what have always been boring... Into something
-                    fun.
+                    We're making productivity social
                 </div>
                 <div className="flex space-x-2">
                     <button
-                        className="p-4 bg-green-500 rounded-lg transition hover:opacity-90 text-white"
+                        className="p-4 transition hover:opacity-90 text-white border-b-2 border-opacity-0 hover:border-opacity-50 border-white"
                         onClick={() => {
                             router.push('/login');
                         }}
@@ -38,7 +30,7 @@ export default function Home() {
                         Login
                     </button>
                     <button
-                        className="p-4 bg-green-500 rounded-lg transition hover:opacity-90 text-white"
+                        className="p-4 transition hover:opacity-90 text-white border-b-2 border-opacity-0 hover:border-opacity-50 border-white"
                         onClick={() => {
                             router.push('/register');
                         }}

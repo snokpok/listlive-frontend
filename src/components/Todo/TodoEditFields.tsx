@@ -1,7 +1,8 @@
 import TodoEditorContext from '@/common/contexts/todo-editor.context';
 import { UserContext } from '@/common/contexts/user.context';
 import { ITodoItem } from '@/common/interfaces/todo-interfaces';
-import { axiosReqEditTodo } from '@/common/web/queries';
+import { MyListsInterface, useMyLists } from '@/common/stores/useMyLists';
+import { axiosReqEditItem } from '@/common/web/queries';
 import { useFormik } from 'formik';
 import React from 'react';
 import toast from 'react-hot-toast';
@@ -9,18 +10,19 @@ import * as Yup from 'yup';
 import TodoInputFormRaw from './TodoInputFormRaw';
 
 export type TodoItemProps = ITodoItem & {
-    handleDeleteItem: (id: string) => Promise<void>;
-    handleUpdateItem: (item: ITodoItem) => Promise<void>;
+    listId: string;
 };
 
 export default function TodoEditFields({
     id,
     description,
     title,
-    handleUpdateItem,
-}: Pick<TodoItemProps, 'id' | 'handleUpdateItem' | 'description' | 'title'>) {
+    listId,
+}: TodoItemProps) {
     const todoEditorContext = React.useContext(TodoEditorContext);
     const userContext = React.useContext(UserContext);
+
+    const { updateItemFromList } = useMyLists((state) => state);
 
     const formik = useFormik({
         initialValues: {
@@ -32,10 +34,12 @@ export default function TodoEditFields({
             description: Yup.string(),
         }),
         onSubmit: async (values, actions) => {
-            const updateReq = axiosReqEditTodo(userContext.user.token, id, {
-                title,
-                description,
-            });
+            const updateReq = axiosReqEditItem(
+                userContext.user.token,
+                listId,
+                id,
+                values,
+            );
             await toast.promise(
                 updateReq,
                 {
@@ -45,7 +49,7 @@ export default function TodoEditFields({
                 },
                 { position: 'bottom-left' },
             );
-            handleUpdateItem({ ...values, id });
+            updateItemFromList(listId, id, values);
             actions.setSubmitting(false);
             actions.setValues({ title: '', description: '' });
             todoEditorContext.setEditor({
